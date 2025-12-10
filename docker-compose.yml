@@ -5,7 +5,7 @@ services:
     build: .
     image: aig130-project3:latest
     ports:
-      - "8501:8501"
+      - "8080:8080"
     volumes:
       - ./src:/app/src
       - ./data:/app/data
@@ -14,7 +14,7 @@ services:
       - GCP_PROJECT_ID=${GCP_PROJECT_ID}
       - GCP_REGION=${GCP_REGION}
       - VERTEX_ENDPOINT_ID=${VERTEX_ENDPOINT_ID}
-    command: streamlit run src/app.py --server.port=8501 --server.address=0.0.0.0
+    command: streamlit run src/app.py --server.port=8080 --server.address=0.0.0.0
 
   # Optional: Service to run pipeline compilation or other scripts
   pipeline-compiler:

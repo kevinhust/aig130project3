@@ -44,8 +44,8 @@ USER appuser
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
-  CMD python -c "import sys; sys.exit(0)"
+    CMD python -c "import sys; sys.exit(0)"
 
 # Default command: Run the Streamlit app
-EXPOSE 8501
-CMD ["streamlit", "run", "src/app.py", "--server.port=8501", "--server.address=0.0.0.0"]
+EXPOSE 8080
+CMD ["sh", "-c", "streamlit run src/app.py --server.port=${PORT:-8080} --server.address=0.0.0.0"]
