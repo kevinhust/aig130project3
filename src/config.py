@@ -20,7 +20,7 @@ RANDOM_SEED = 42
 
 # Google Cloud Platform (GCP) settings
 # REQUIRED: You MUST replace this with your actual GCP Project ID
-PROJECT_ID = os.environ.get("GCP_PROJECT_ID", "aig130-project3") 
+PROJECT_ID = os.environ.get("GCP_PROJECT_ID", "aig130p3") 
 REGION = os.environ.get("GCP_REGION", "us-central1")
 
 # Resource Names (Must match task.md)
