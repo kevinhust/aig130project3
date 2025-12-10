@@ -30,8 +30,16 @@ echo "🔍 Finding Vertex AI Endpoint..."
 ENDPOINT_ID=$(gcloud ai endpoints list --region=$REGION --filter="display_name=smart-home-intent-model-endpoint" --format="value(name)" | head -n 1)
 
 if [ -n "$ENDPOINT_ID" ]; then
-    echo "🔻 Undeploying models from Endpoint: $ENDPOINT_ID..."
-    gcloud ai endpoints undeploy-all $ENDPOINT_ID --region=$REGION --quiet
+    echo "🔻 Checking for deployed models on Endpoint: $ENDPOINT_ID..."
+    # List deployed model IDs
+    DEPLOYED_MODELS=$(gcloud ai endpoints describe $ENDPOINT_ID --region=$REGION --format="value(deployedModels.id)")
+    
+    for MODEL_ID in $DEPLOYED_MODELS; do
+        if [ -n "$MODEL_ID" ]; then
+            echo "   Undeploying model $MODEL_ID..."
+            gcloud ai endpoints undeploy-model $MODEL_ID --endpoint=$ENDPOINT_ID --region=$REGION --quiet
+        fi
+    done
     
     echo "🗑️  Deleting Endpoint: $ENDPOINT_ID..."
     gcloud ai endpoints delete $ENDPOINT_ID --region=$REGION --quiet
