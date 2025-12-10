@@ -62,7 +62,7 @@ jobs:
     # 2. Trigger Vertex AI Training Pipeline
     # Using environment variables to override config.py defaults if needed
     - name: Install Python Deps for Pipeline
-      run: pip install google-cloud-aiplatform google-cloud-storage kfp
+      run: pip install google-cloud-aiplatform google-cloud-storage kfp google-cloud-pipeline-components
 
     - name: Run Vertex AI Pipeline
       env:
