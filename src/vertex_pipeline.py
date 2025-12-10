@@ -6,22 +6,29 @@ from google_cloud_pipeline_components.v1.automl.training_job import (
 from google_cloud_pipeline_components.v1.endpoint import (
     EndpointCreateOp, ModelDeployOp
 )
-
+from google_cloud_pipeline_components.v1.dataset import (
+    TabularDatasetCreateOp
+)
 
 @dsl.pipeline(
-
-
     name="smart-home-intent-classification",
     description="AutoML Tabular pipeline for smart home commands"
 )
 def pipeline(
     project: str,
     location: str,
-
     bucket_uri: str,
     display_name: str,
     dataset_csv_uri: str,  # gs://.../training_data.csv
 ):
+    # 0. Create Managed Dataset from CSV
+    dataset_op = TabularDatasetCreateOp(
+        project=project,
+        location=location,
+        display_name=display_name,
+        gcs_source=dataset_csv_uri,
+    )
+
     # 1. Train AutoML Model
     training_op = AutoMLTabularTrainingJobRunOp(
         project=project,
@@ -31,11 +38,10 @@ def pipeline(
         budget_milli_node_hours=1000,  # 1 hour budget (minimum)
         column_transformations=[
             {"numeric": {"column_name": "emb_0"}},
-            # In a real scenario, you'd list all 384 columns.
-            # For simplicity, we rely on AutoML inference.
+            # We rely on AutoML inference for columns not explicitly listed, 
+            # or list key columns if needed. 
         ],
-
-        dataset_uri=dataset_csv_uri,
+        dataset=dataset_op.outputs["dataset"],
         target_column="target_intent",
     )
 
@@ -47,7 +53,6 @@ def pipeline(
     )
 
     # 3. Deploy Model
-    # Condition: Only deploy if training succeeds (implicit dependency)
     ModelDeployOp(
         model=training_op.outputs["model"],
         endpoint=endpoint_op.outputs["endpoint"],
@@ -95,4 +100,3 @@ if __name__ == "__main__":
     # Submit
     job.submit()
     print(f"🎉 Job submitted! View status here: {job._dashboard_uri()}")
-
