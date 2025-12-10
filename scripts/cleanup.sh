@@ -50,6 +50,16 @@ else
     echo "Model not found."
 fi
 
-echo "✅ Cleanup of compute resources complete!"
-echo "Note: GCS Buckets and Artifact Registry images represent storage and were NOT deleted to preserve data."
-echo "Run 'gcloud artifacts repositories delete $REPO_NAME --location=$REGION' if you want to delete images too."
+# 4. Artifact Registry (Optional)
+echo ""
+echo "📦 Docker Images in Artifact Registry are NOT deleted by default."
+echo "Storage costs are low, but you can delete them to be safe."
+read -p "Do you want to delete the Docker Repository '$REPO_NAME' as well? (y/N) " -n 1 -r
+echo
+if [[ $REPLY =~ ^[Yy]$ ]]; then
+    echo "🗑️  Deleting Artifact Registry Repository: $REPO_NAME..."
+    gcloud artifacts repositories delete $REPO_NAME --location=$REGION --quiet
+fi
+
+echo "✅ Cleanup complete!"
+echo "Note: GCS Bucket '$PROJECT_ID-data' was NOT deleted."
