@@ -1,68 +1,56 @@
-# AIG130 Project 3: Smart Home Voice Command MLOps
+# AIG130 Project 3: Smart Home Intent Classification
 
-This project implements an end-to-end MLOps pipeline for classifying smart home voice commands using **HuggingFace** (for embeddings) and **Google Cloud Vertex AI** (for AutoML training).
+This project implements a Machine Learning pipeline for classifying smart home voice commands (e.g., "Turn on the lights") using **HuggingFace** embeddings and **Google Cloud Vertex AI** AutoML.
 
-## 📂 Repository Structure
-```
-.
-├── .github/workflows/ml-pipeline.yml  # CI/CD: Builds Docker, runs embedding, triggers Vertex
-├── data/                              # Place dataset.csv here
-├── docs/                              # Report, demo scripts, etc.
-├── src/
-│   ├── app.py                         # Streamlit Demo App
-│   ├── embed.py                       # Data Prep & Embedding Generation
-│   ├── predict.py                     # Inference with Vertex Endpoint
-│   └── vertex_pipeline.py             # KFP Pipeline Definition
-├── Dockerfile                         # Env for embedding step
-└── requirements.txt                   # Dependencies
-```
+## 🚀 Quick Start
 
-## 🚀 Setup Instructions
+### Prerequisites
+- Docker & Docker Compose
+- Python 3.9+
+- Google Cloud Platform Account
 
-### 1. Google Cloud Platform (GCP) Setup
-1.  **Create a Project**: Name it `smart-home-mlops` (or similar).
-2.  **Enable APIs**:
-    - Vertex AI API
-    - Cloud Storage API
-    - Container Registry API (or Artifact Registry)
-    - Cloud Build API (optional, for CI/CD)
-3.  **Create Service Account**:
-    - Go to IAM & Admin > Service Accounts.
-    - Create new account (description: "GitHub Actions Runner").
-    - **Roles**: `Storage Admin`, `Vertex AI Administrator`, `Service Account User`.
-    - **Keys**: Create a JSON key and download it.
-4.  **Create Storage Bucket**:
-    - Name: `smart-home-data-bucket` (must be globally unique).
-    - Region: `us-central1`.
+### Running Locally
+To start the application locally using Docker:
 
-### 2. GitHub Secrets
-1.  Go to your GitHub Repo > Settings > Secrets and variables > Actions.
-2.  Add New Repository Secret:
-    - Name: `GCP_SA_KEY`
-    - Value: Paste the content of the JSON key file.
-
-### 3. Running Locally (Testing)
 ```bash
-# Install dependencies
-pip install -r requirements.txt
-
-# Run embedding logic locally
-python src/embed.py --input_file data/dataset.csv
-
-# Run Streamlit App (after deploying endpoint)
-streamlit run src/app.py
+./scripts/run_local.sh
 ```
 
-### 4. Deployment Check
-- Push code to `main`.
-- Go to **Actions** tab in GitHub to see the pipeline run.
-- Check **Vertex AI Console** > Training / Pipelines to see the job.
-- Once trained, deploy the model to an Endpoint via the console (if not fully automated in pipeline).
-- Get the `ENDPOINT_ID` and use it in the Streamlit App.
+Or manually:
+```bash
+docker-compose up
+```
+The app will be available at http://localhost:8501
 
-## 💰 Cost Estimate
-**Total Estimated Cost: < $2.00**
-- **Storage**: < $0.01 (Dataset is tiny, ~50KB).
-- **Vertex AI AutoML Training**: ~$1.00 - $1.50 (1 node hour minimum @ ~$2/hr, but likely faster or covered by free tier credits if new account).
-- **Vertex AI Endpoint**: ~$0.10/hour. **CRITICAL: DELETE THE ENDPOINT AFTER DEMO**.
-- **GitHub Actions**: Free (public repo tier).
+### Environment Setup
+Check if you have the necessary tools installed:
+```bash
+./scripts/verify_setup.sh
+```
+
+## 🏗 Architecture
+
+- **`src/app.py`**: Main Streamlit application.
+- **`src/config.py`**: Centralized configuration.
+- **`src/vertex_pipeline.py`**: Definition of Vertex AI Training Pipeline.
+- **`Dockerfile`**: Multi-stage build for efficient production images.
+- **`docker-compose.yml`**: Local development orchestration.
+- **`.github/workflows`**: CI/CD pipeline for automated testing.
+
+## 🛠 Configuration
+
+Configuration is managed via `src/config.py` and environment variables. Key variables:
+- `GCP_PROJECT_ID`: Your Google Cloud Project ID.
+- `GCP_REGION`: Region for Vertex AI (default: us-central1).
+- `VERTEX_ENDPOINT_ID`: ID of the deployed endpoint (for prediction).
+
+## 📦 Deployment
+
+The project is designed to be deployed to Google Cloud Run or GKE, using the Docker image built by the CI/CD pipeline.
+
+1. **Build Image**: `docker build -t aig130-project3 .`
+2. **Push to Artifact Registry**: `docker push ...`
+3. **Deploy**: Use Cloud Run or follow `docs/demo_script.md`.
+
+## 📚 Documentation
+See the `docs/` directory for detailed reports, evaluation metrics, and reflection templates.

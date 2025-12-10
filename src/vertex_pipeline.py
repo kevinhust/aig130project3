@@ -57,8 +57,11 @@ def pipeline(
     )
 
 if __name__ == "__main__":
+    import config
+    
     compiler.Compiler().compile(
         pipeline_func=pipeline,
         package_path="vertex_pipeline.json"
     )
     print("Pipeline compiled to vertex_pipeline.json")
+    print(f"Defaults - Project: {config.PROJECT_ID}, Region: {config.REGION}")

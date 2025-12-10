@@ -1,19 +1,24 @@
 import streamlit as st
 import os
-from predict import Predictor
+import sys
 
-# Configuration
-# Ideally these come from env vars or config file
-PROJECT_ID = os.environ.get('GCP_PROJECT_ID', 'smart-home-mlops')
-REGION = os.environ.get('GCP_REGION', 'us-central1')
-ENDPOINT_ID = os.environ.get('VERTEX_ENDPOINT_ID', '')  # User sets this
+# Add src to path to ensure local imports work
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+
+from predict import Predictor
+import config
+
+# Configuration from config.py
+PROJECT_ID = config.PROJECT_ID
+REGION = config.REGION
+# Endpoint ID is usually specific to a deployment, so we might keep it as a user input or env var
+ENDPOINT_ID = os.environ.get('VERTEX_ENDPOINT_ID', '')
 
 st.title("🏠 Smart Home Command Intent Classifier")
-st.markdown("""
-This demo uses **HuggingFace** for text embeddings
+st.markdown(f"""
+This demo uses **HuggingFace** ({config.HF_MODEL_NAME}) for text embeddings
 and **Google Cloud Vertex AI** for intent classification.
 """)
-
 
 # Sidebar config
 st.sidebar.header("Configuration")
@@ -40,9 +45,7 @@ else:
         placeholder="e.g., Turn on the kitchen lights now"
     )
 
-
     if st.button("Classify") and command and predictor:
-
         with st.spinner("Processing..."):
             try:
                 # Get prediction
@@ -52,7 +55,6 @@ else:
                 st.subheader("Prediction Result")
 
                 # Handling AutoML Tabular Classification response format
-                # Usually: {'classes': ['class1'], 'scores': [0.9]}
                 if 'classes' in result and 'scores' in result:
                     classes = result['classes']
                     scores = result['scores']
@@ -89,4 +91,3 @@ else:
 
 st.markdown("---")
 st.caption("Built for AIG130 Project 3")
-
