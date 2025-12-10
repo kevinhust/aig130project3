@@ -58,10 +58,41 @@ def pipeline(
 
 if __name__ == "__main__":
     import config
-    
+    from google.cloud import aiplatform
+
+    # 1. Compile
+    pipeline_path = "vertex_pipeline.json"
     compiler.Compiler().compile(
         pipeline_func=pipeline,
-        package_path="vertex_pipeline.json"
+        package_path=pipeline_path
     )
-    print("Pipeline compiled to vertex_pipeline.json")
-    print(f"Defaults - Project: {config.PROJECT_ID}, Region: {config.REGION}")
+    print(f"✅ Pipeline compiled to {pipeline_path}")
+
+    # 2. Submit to Vertex AI
+    print(f"🚀 Submitting pipeline to Vertex AI ({config.REGION})...")
+    
+    # Initialize Vertex AI SDK
+    aiplatform.init(
+        project=config.PROJECT_ID,
+        location=config.REGION,
+        staging_bucket=f"gs://{config.BUCKET_NAME}"
+    )
+
+    # Define job
+    job = aiplatform.PipelineJob(
+        display_name=f"{config.MODEL_DISPLAY_NAME}-pipeline",
+        template_path=pipeline_path,
+        parameter_values={
+            "project": config.PROJECT_ID,
+            "location": config.REGION,
+            "bucket_uri": f"gs://{config.BUCKET_NAME}",
+            "display_name": config.MODEL_DISPLAY_NAME,
+            "dataset_csv_uri": f"gs://{config.BUCKET_NAME}/{config.DATA_FILE}",
+        },
+        enable_caching=True
+    )
+
+    # Submit
+    job.submit()
+    print(f"🎉 Job submitted! View status here: {job._dashboard_uri()}")
+
