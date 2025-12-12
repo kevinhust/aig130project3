@@ -32,21 +32,25 @@ def deploy_model():
     # SDK method: aiplatform.Model.upload(..., artifact_uri=...)
     # So we need to put it on GCS first.
     
-    # Upload to GCS manually first to be safe and explicit
-    # Using 'gsutil' via python subprocess or storage client
-    gcs_model_path = f"gs://{config.BUCKET_NAME}/custom_model_artifacts/"
-    local_model_dir = "model_artifacts"
+    # Upload to GCS using Python SDK (no gsutil dependency)
+    gcs_model_uri = f"gs://{config.BUCKET_NAME}/custom_model_artifacts/"
+    local_model_path = "model_artifacts/model.joblib"
+    blob_name = "custom_model_artifacts/model.joblib"
     
-    print(f"📤 Uploading {local_model_dir} to {gcs_model_path}...")
-    # Using CLI for recursive upload is easiest
-    os.system(f"gsutil -m cp -r {local_model_dir}/* {gcs_model_path}")
+    print(f"📤 Uploading {local_model_path} to {gcs_model_uri}...")
+    
+    from google.cloud import storage
+    storage_client = storage.Client(project=config.PROJECT_ID)
+    bucket = storage_client.get_bucket(config.BUCKET_NAME)
+    blob = bucket.blob(blob_name)
+    blob.upload_from_filename(local_model_path)
 
     print("✅ Uploaded model artifacts.")
     
     print("📦 Registering Model in Vertex AI...")
     model = aiplatform.Model.upload(
         display_name="smart-home-custom-rf",
-        artifact_uri=gcs_model_path,
+        artifact_uri=gcs_model_uri,
         serving_container_image_uri=serving_container,
         description="Custom RandomForest trained locally via scikit-learn"
     )
