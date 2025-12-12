@@ -74,16 +74,21 @@ def deploy_model():
     
     # 4. Deploy Model to Endpoint
     print(f"🚀 Deploying model to endpoint... (This takes 10-15 mins)")
-    # machine_type=n1-standard-2 is standard
-    # traffic_split={"0": 100} directs 100% traffic to the new model
-    model.deploy(
-        endpoint=endpoint,
-        machine_type="n1-standard-2",
-        min_replica_count=1,
-        max_replica_count=1,
-        traffic_split={"0": 100}, 
-        deploy_request_timeout=1200
-    )
+    print(f"SDK Version: {aiplatform.__version__}")
+    
+    try:
+        model.deploy(
+            endpoint=endpoint,
+            machine_type="n1-standard-2",
+            min_replica_count=1,
+            max_replica_count=1,
+            traffic_percentage=100, # Correct parameter for new deployment traffic
+            deploy_request_timeout=1200
+        )
+    except Exception as e:
+        print(f"❌ Deployment Failed: {e}")
+        # Try without traffic_percentage if it fails (fallback) or print more info
+        raise e
     
     print("🎉 Deployment Complete!")
     print(f"👉 Endpoint ID: {endpoint.resource_name}")
