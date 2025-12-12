@@ -48,6 +48,7 @@ jobs:
         ls -R
         python -m venv .venv
         .venv/bin/pip install --upgrade pip
+        .venv/bin/pip install setuptools
         .venv/bin/pip install -r requirements_deploy.txt
         .venv/bin/python scripts/deploy_custom_model.py
 
