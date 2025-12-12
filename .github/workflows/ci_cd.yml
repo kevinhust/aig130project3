@@ -61,8 +61,30 @@ jobs:
     - name: Set up Cloud SDK
       uses: google-github-actions/setup-gcloud@v1
 
-    # 1. Build and Push Docker Image
-    - name: Build and Push Container
+    # 7. Train Custom Model Locally (on Runner)
+    - name: Train Custom Model
+      run: |
+        python -m venv .venv
+        source .venv/bin/activate
+        pip install -r requirements.txt
+        python src/train_custom.py
+    
+    # 8. Deploy Custom Model to Vertex AI
+    # Note: This step takes 10-15 mins.
+    - name: Deploy Model to Vertex AI
+      env:
+        GOOGLE_APPLICATION_CREDENTIALS: ${{ github.workspace }}/gcp-key.json
+      run: |
+        source .venv/bin/activate
+        # We need 'gsutil' which is pre-installed in 'ubuntu-latest' or we can rely on python
+        # Our script uses 'os.system(gsutil)', so we ensure google-cloud-sdk is setup.
+        # The 'auth' step earlier sets up gcloud/gsutil auth.
+        python scripts/deploy_custom_model.py
+
+    # 9. Build and Push Docker Image (Cloud Run)
+    # This happens in parallel or after model deployment. 
+    # Since we updated the Dockerfile to cache models, we rebuild here.
+    - name: Build and Push to Artifact Registry
       run: |
         gcloud auth configure-docker ${{ env.GAR_LOCATION }}-docker.pkg.dev
         docker build -t ${{ env.GAR_LOCATION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.IMAGE }}:${{ github.sha }} .

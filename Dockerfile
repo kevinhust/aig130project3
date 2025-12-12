@@ -34,14 +34,20 @@ WORKDIR /app
 # Copy dependencies from builder
 COPY --from=builder --chown=appuser:appuser /root/.local /home/appuser/.local
 
+# Pre-download Hugging Face model to avoid rate limits at runtime
+ENV HF_HOME=/app/model_cache
+RUN mkdir -p ${HF_HOME} && chown -R appuser:appuser ${HF_HOME}
+
 # Copy source code
 COPY --chown=appuser:appuser src/ ./src/
 COPY --chown=appuser:appuser docs/ ./docs/
-# data/ is often mounted, but we can copy initial data if present
 COPY --chown=appuser:appuser dataset.csv ./data/dataset.csv
 
 # Switch to non-root user
 USER appuser
+
+# Trigger model download
+RUN python -c "from sentence_transformers import SentenceTransformer; SentenceTransformer('all-MiniLM-L6-v2')"
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \

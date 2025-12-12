@@ -65,7 +65,7 @@ export APP_NAME="smart-home-app"
 
 ### Step 2: Enable APIs & Create Repo
 ```bash
-gcloud services enable artifactregistry.googleapis.com run.googleapis.com aiplatform.googleapis.com
+gcloud services enable artifactregistry.googleapis.com run.googleapis.com aiplatform.googleapis.com cloudresourcemanager.googleapis.com storage-component.googleapis.com
 
 gcloud artifacts repositories create $REPO_NAME \
     --repository-format=docker \

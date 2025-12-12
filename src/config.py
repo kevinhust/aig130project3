@@ -3,6 +3,10 @@ Configuration settings for Smart Home Intent Classification Pipeline
 """
 import os
 from pathlib import Path
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 # Project paths
 BASE_DIR = Path(__file__).parent.parent
@@ -30,12 +34,13 @@ IMAGE_NAME = "smart-home-app"
 SERVICE_NAME = "smart-home-app"
 
 # Model settings
-MODEL_DISPLAY_NAME = "smart-home-intent-model"
+MODEL_DISPLAY_NAME = "smart-home-intent-classification"
+ENDPOINT_DISPLAY_NAME = "smart-home-endpoint" # Added for custom deployment script
 TRAIN_TEST_SPLIT_RATIO = 0.8
 BATCH_SIZE = 32
 
-# HuggingFace settings
-HF_MODEL_NAME = "bert-base-uncased"
+# Hugging Face Settings
+HF_MODEL_NAME = "sentence-transformers/all-MiniLM-L6-v2"
 
 # Logging
 LOG_LEVEL = os.environ.get("LOG_LEVEL", "INFO")
