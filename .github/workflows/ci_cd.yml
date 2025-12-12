@@ -45,14 +45,12 @@ jobs:
         GCP_REGION: ${{ env.REGION }}
         GCS_BUCKET_NAME: "aig130-project3-data"
       run: |
+        ls -R
         python -m venv .venv
         .venv/bin/pip install --upgrade pip
-        .venv/bin/pip install -r requirements_train.txt
+        .venv/bin/pip install -r requirements_deploy.txt
         
-        echo "🚀 Training Model on Linux Runner..."
-        .venv/bin/python src/train_custom.py
-        
-        echo "🚀 Deploying Model..."
+        echo "🚀 Deploying Pre-trained Model..."
         .venv/bin/python scripts/deploy_custom_model.py
 
     # 3. Build and Push Docker Image (Cloud Run)
