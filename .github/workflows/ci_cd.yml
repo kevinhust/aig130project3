@@ -45,10 +45,11 @@ jobs:
         GCP_REGION: ${{ env.REGION }}
         GCS_BUCKET_NAME: "aig130-project3-data"
       run: |
-        source .venv/bin/activate || python -m venv .venv && source .venv/bin/activate
-        python -m pip install --upgrade pip
-        pip install -r requirements_deploy.txt
-        python scripts/deploy_custom_model.py
+        ls -R
+        python -m venv .venv
+        .venv/bin/pip install --upgrade pip
+        .venv/bin/pip install -r requirements_deploy.txt
+        .venv/bin/python scripts/deploy_custom_model.py
 
     # 3. Build and Push Docker Image (Cloud Run)
     - name: Build and Push to Artifact Registry

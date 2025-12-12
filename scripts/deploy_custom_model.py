@@ -37,6 +37,15 @@ def deploy_model():
     local_model_path = "model_artifacts/model.joblib"
     blob_name = "custom_model_artifacts/model.joblib"
     
+    print(f"📂 Current Dir: {os.getcwd()}")
+    if not os.path.exists(local_model_path):
+        print(f"❌ Error: Model file not found at {local_model_path}")
+        print("Listing directory:")
+        for root, dirs, files in os.walk("."):
+            for file in files:
+                print(os.path.join(root, file))
+        sys.exit(1)
+        
     print(f"📤 Uploading {local_model_path} to {gcs_model_uri}...")
     
     from google.cloud import storage
