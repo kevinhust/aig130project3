@@ -18,11 +18,7 @@ def deploy_model():
 
     # 2. Upload Model to Vertex AI
     # We use the pre-built Scikit-learn container provided by Google
-    # Check version compatibility: sklearn 1.3 might need recent container. 
-    # sklearn-cpu.1-2-1 is for 1.2.
-    # Let's try sklearn-cpu.1-3 if exists, or latest. 
-    # Actually, Google documentation says: us-docker.pkg.dev/vertex-ai/prediction/sklearn-cpu.1-3:latest
-    
+    # Updated to sklearn-cpu.1-3 for compatibility with scikit-learn 1.3.x
     serving_container = "us-docker.pkg.dev/vertex-ai/prediction/sklearn-cpu.1-3:latest"
     
     # Model artifact *directory* path (local)
