@@ -62,15 +62,16 @@ def deploy_model():
     print(f"✅ Model Uploaded: {model.resource_name}")
 
     # 3. Create/Get Endpoint
-    endpoint_name = config.ENDPOINT_DISPLAY_NAME
-    endpoints = aiplatform.Endpoint.list(filter=f'display_name="{endpoint_name}"')
+    import datetime
+    timestamp = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
+    endpoint_name = f"{config.ENDPOINT_DISPLAY_NAME}-{timestamp}"
     
-    if endpoints:
-        endpoint = endpoints[0]
-        print(f"🔹 Found existing endpoint: {endpoint.resource_name}")
-    else:
-        print(f"🔹 Creating new endpoint: {endpoint_name}...")
-        endpoint = aiplatform.Endpoint.create(display_name=endpoint_name)
+    # We always create a new endpoint to avoid conflicts with stuck/failed usage
+    # old code: endpoints = aiplatform.Endpoint.list(filter=f'display_name="{endpoint_name}"')
+    
+    # Just create new
+    print(f"🔹 Creating new unique endpoint: {endpoint_name}...")
+    endpoint = aiplatform.Endpoint.create(display_name=endpoint_name)
     
     # 4. Deploy Model to Endpoint
     print(f"🚀 Deploying model to endpoint... (This takes 10-15 mins)")
