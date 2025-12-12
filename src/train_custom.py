@@ -24,8 +24,20 @@ def train_local():
     print(f"   Rows: {len(df)}")
     
     # 2. Embeddings
+    import time
     print("🧠 Generating embeddings (this may take a moment)...")
-    embedder = SentenceTransformer('all-MiniLM-L6-v2')
+    
+    embedder = None
+    for attempt in range(5):
+        try:
+            embedder = SentenceTransformer('all-MiniLM-L6-v2')
+            break
+        except Exception as e:
+            print(f"⚠️ Attempt {attempt+1} failed to load HF model: {e}")
+            time.sleep(10 * (attempt + 1))
+            
+    if embedder is None:
+        raise RuntimeError("Failed to download HF model after 5 attempts")
     X = embedder.encode(df['Sentence'].tolist())
     y = df['Category']
     
