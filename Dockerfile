@@ -1,7 +1,7 @@
 # Multi-stage Dockerfile for Smart Home Intent Classification
 
 # Stage 1: Builder
-FROM python:3.9-slim as builder
+FROM python:3.9 as builder
 
 WORKDIR /app
 
@@ -12,10 +12,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 # Install Python dependencies
 COPY requirements.txt .
-RUN pip install --no-cache-dir --user -r requirements.txt
+RUN pip install --upgrade pip setuptools wheel && \
+    pip install --no-cache-dir --user -r requirements.txt
 
 # Stage 2: Runtime
-FROM python:3.9-slim
+FROM python:3.9
 
 # Set environment variables
 ENV PYTHONUNBUFFERED=1 \
