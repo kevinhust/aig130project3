@@ -1,0 +1,33 @@
+# Use explicit platform to ensure x86 compatibility matches Vertex AI
+FROM --platform=linux/amd64 python:3.10-slim
+
+WORKDIR /app
+
+# Install build dependencies
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Python dependencies with strict version pinning
+# This ensures we replicate the exact environment needed for the model
+RUN pip install --no-cache-dir \
+    "numpy<2.0" \
+    "pandas" \
+    "scikit-learn==1.3.0" \
+    "sentence-transformers==2.2.2" \
+    "joblib" \
+    "huggingface-hub<0.25.0" \
+    "python-dotenv"
+
+# Copy source code and data
+COPY src/ ./src/
+COPY dataset.csv ./
+
+# Set python path
+ENV PYTHONPATH=/app
+
+# Create output directory
+RUN mkdir -p model_artifacts
+
+# Default command runs the training script
+CMD ["python", "src/train_custom.py"]
