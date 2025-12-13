@@ -35,7 +35,9 @@ SERVICE_NAME = "smart-home-app"
 
 # Model settings
 MODEL_DISPLAY_NAME = "smart-home-intent-classification"
-ENDPOINT_DISPLAY_NAME = "smart-home-endpoint" # Added for custom deployment script
+ENDPOINT_DISPLAY_NAME = "smart-home-endpoint" 
+# Hardcoded ID from successful deployment (Plan D)
+VERTEX_ENDPOINT_ID = "7379841781283684352"
 TRAIN_TEST_SPLIT_RATIO = 0.8
 BATCH_SIZE = 32
 

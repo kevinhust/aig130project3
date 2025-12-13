@@ -11,8 +11,8 @@ import config
 # Configuration from config.py
 PROJECT_ID = config.PROJECT_ID
 REGION = config.REGION
-# Endpoint ID is usually specific to a deployment, so we might keep it as a user input or env var
-ENDPOINT_ID = os.environ.get('VERTEX_ENDPOINT_ID', '')
+# Endpoint ID from config or env
+VERTEX_ENDPOINT_ID = os.environ.get('VERTEX_ENDPOINT_ID', config.VERTEX_ENDPOINT_ID)
 
 st.title("🏠 Smart Home Command Intent Classifier")
 st.markdown(f"""
@@ -25,7 +25,7 @@ st.sidebar.header("Configuration")
 project_id_input = st.sidebar.text_input("GCP Project ID", value=PROJECT_ID)
 region_input = st.sidebar.text_input("GCP Region", value=REGION)
 endpoint_id_input = st.sidebar.text_input(
-    "Vertex Endpoint ID", value=ENDPOINT_ID
+    "Vertex Endpoint ID", value=VERTEX_ENDPOINT_ID
 )
 
 if not endpoint_id_input:
